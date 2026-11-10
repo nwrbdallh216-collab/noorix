@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOORIX - حسابي وتسجيل الدخول</title>
+    <!-- استدعاء مكتبة Supabase للربط بقاعدة البيانات -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .auth-card {
+            width: 100%;
+            max-width: 380px;
+            background: #111;
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid #222;
+            text-align: center;
+        }
+        h2 { font-size: 24px; margin-bottom: 8px; letter-spacing: 1px; }
+        p.subtitle { font-size: 13px; color: #888; margin-bottom: 25px; }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 12px;
+            background: #222;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            text-align: right;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #ff0050;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+        button:hover { background: #e00045; }
+        .back-link {
+            display: block;
+            margin-top: 20px;
+            color: #aaa;
+            font-size: 13px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-card">
+        <h2>NOORIX</h2>
+        <p class="subtitle">أنشئي حسابك أو سجلي الدخول للمتابعة</p>
+        
+        <input type="email" id="email" placeholder="البريد الإلكتروني">
+        <input type="password" id="password" placeholder="كلمة المرور">
+        
+        <button onclick="handleAuth()">دخول / تسجيل</button>
+        
+        <a href="index.html" class="back-link">العودة للرئيسية 🏠</a>
+    </div>
+
+    <script>
+        // ربط بيانات Supabase التي استخرجناها
+        const supabaseUrl = 'https://eqokxywybqnmdpioffdi.supabase.co';
+        const supabaseKey = 'sb_publishable_fcn46sPMidhmq31J...'; // اكتمل المفتاح هنا
+        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+        async function handleAuth() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (!email || !password) {
+                alert('الرجاء إدخال البريد وكلمة المرور');
+                return;
+            }
+
+            // محاولة تسجيل الدخول أولاً
+            let { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+            
+            if (error) {
+                // إذا لم يكن الحساب موجوداً، نقوم بإنشاء حساب جديد تلقائياً
+                let { data: signUpData, error: signUpError } = await _supabase.auth.signUp({ email, password });
+                if (signUpError) {
+                    alert('خطأ: ' + signUpError.message);
+                } else {
+                    alert('تم إنشاء الحساب بنجاح! أهلاً بكِ في NOORIX 🎉');
+                    window.location.href = 'index.html';
+                }
+            } else {
+                alert('تم تسجيل الدخول بنجاح! 🚀');
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+</body>
+</html>
